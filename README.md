@@ -26,16 +26,17 @@ Edit `/etc/netplan/01-netcfg.yaml ` file:
 ```yml
 network:
   version: 2
-  renderer: networkd
   ethernets:
     eth0:
-      addresses:
-        - 192.168.0.25/24
+      dhcp4: false
+      addresses: [192.168.0.25/24]
+      gateway4: 192.168.0.1
       nameservers:
         addresses: [8.8.8.8, 1.1.1.1]
-        routes:
-          - to: default
-            via: 192.168.0.1
+```
+Run command:
+```shell
+sudo netplan apply
 ```
 
 ## Install Docker
