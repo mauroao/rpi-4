@@ -15,7 +15,7 @@ ssh pi@pi_ip_address
 password: pi
 ```
 
-## Update Raspberry OS
+## Update Ubuntu
 ```
 sudo apt update
 sudo apt -y upgrade
