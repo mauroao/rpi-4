@@ -117,8 +117,6 @@ https://www.raspberrypi.org/forums/viewtopic.php?f=50&t=11870
 
 ## Other
 
-- libseccomp2_2.5.1-1_armhf.deb
-- dpkg -l | grep libseccomp2
 - https://askubuntu.com/questions/1263284/apt-update-throws-signature-error-in-ubuntu-20-04-container-on-arm 
 - https://www.zdnet.com/article/raspberry-pi-extending-the-life-of-the-sd-card/
 - https://www.raspberrypi.org/documentation/hardware/raspberrypi/bootmodes/msd.md
