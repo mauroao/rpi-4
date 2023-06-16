@@ -9,7 +9,7 @@
 5. Configure user and pass: pi / pi
 6. Write image;
 
-## Connect by SSH
+## Connect via ssh
 ```Shell
 ssh pi@pi_ip_address
 password: pi
