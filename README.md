@@ -1,6 +1,6 @@
 # :white_check_mark: My Raspberry PI Setup
 
-## HDD preparation
+## Prepare ssd
 
 1. Open "Raspberry PI Imager" app;
 2. Choose Ubuntu Server;
