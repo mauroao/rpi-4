@@ -4,48 +4,45 @@
 
 1. Open "Raspberry PI Imager" app;
 2. Choose Ubuntu Server;
-3. Configure SSH;
+3. Configure ssh;
+4. Configure hostname: rpi-4
+5. Configure user and pass: pi / pi
 6. Write image;
 
 ## Connect by SSH
 ```Shell
-$ ssh pi@pi_ip_address
+ssh pi@pi_ip_address
 password: pi
 ```
 
 ## Update Raspberry OS
 ```
-$ sudo apt update
-$ sudo apt full-upgrade -y
-$ sudo apt install vim -y
-$ timedatectl set-timezone America/Sao_Paulo
-$ sudo raspi-config
-   => System Options
-      => Password = pi
-      => Hostname = rpi-4
-   => Localization Options
-      => WLAN Country = Brazil
-      => Timezone = America/Sao_Paulo
+sudo apt update
+sudo apt -y upgrade
 ```
 
 ## Configure static IP
-Edit `/etc/dhcpcd.conf` file:
-```
-interface eth0
-static ip_address=192.168.0.25/24
-static routers=192.168.0.1
-static domain_name_servers=8.8.8.8. 8.8.4.4
+Edit `/etc/netplan/01-netcfg.yaml ` file:
+```yml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      addresses:
+        - 192.168.0.25/24
+      nameservers:
+        addresses: [8.8.8.8, 1.1.1.1]
+        routes:
+          - to: default
+            via: 192.168.0.1
 ```
 
 ## Install Docker
-```
-$ curl -fsSL https://get.docker.com -o get-docker.sh
-$ sudo sh get-docker.sh
-$ sudo groupadd docker
-$ sudo usermod -aG docker $USER
-$ sudo systemctl enable docker.service
-$ sudo systemctl enable containerd.service
-```
+
+- https://docs.docker.com/engine/install/ubuntu/
+- https://docs.docker.com/engine/install/linux-postinstall/
+
 
 ## Install Docker-Compose
 ```
