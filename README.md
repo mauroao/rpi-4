@@ -34,7 +34,7 @@ network:
         - to: default
           via: 192.168.0.1
       nameservers:
-        addresses: [8.8.8.8, 1.1.1.1]****
+        addresses: [8.8.8.8, 1.1.1.1]
 ```
 Run command:
 ```shell
