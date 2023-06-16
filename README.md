@@ -1,4 +1,8 @@
-# :white_check_mark: My Raspberry PI Setup
+<div align="center">
+  <img src="./img/logo.png" alt="logo" /> <br /> <br />
+  <h1>Raspberry Pi 4 as a Home Server</h1>
+</div>
+<br />
 
 ## Prepare ssd
 
@@ -51,27 +55,56 @@ sudo netplan apply
 
 - https://docs.portainer.io/start/install-ce/server/docker/linux
 
-## Install Samba (optional)
+## Install Samba
+
+Create folder
+
 ```shell
-$ sudo apt update
-$ sudo apt upgrade -y
-$ sudo apt install samba samba-common-bin -y
-$ mkdir /home/pi/files
-$ sudo chmod 0777 /home/pi/files
-$ sudo chown -R nobody:nogroup /home/pi/files
+mkdir /home/pi/public
+sudo chmod 0777 /home/pi/public
+sudo chown -R nobody:nogroup /home/pi/public
 ```
+
+Install samba
+
+```shell
+sudo apt update
+sudo apt install samba -y
+samba -V
+systemctl status smbd
+sudo smbpasswd -a pi
+```
+
 Edit `/etc/samba/smb.conf` file:
+
 ```
-[Files]
-   path = /home/pi/files
-   writable = yes
-   guest ok = yes
-   guest only = yes
-   read only = no
-   create mode = 0777
-   directory mode = 0777
-   force user = nobody
+[global]
+workgroup = WORKGROUP
+server string = Samba Server %v
+security = user
+map to guest = Bad User
+dns proxy = no
+
+[public]
+path = /home/pi/public
+valid users = pi
+read only = no
+create mode = 0777
+directory mode = 0777
 ```
+
+Test samba configuration
+
+```shell
+testparm
+```
+
+Restart samba
+
+```shell
+sudo systemctl restart smbd.service
+```
+
  
  ## Problem with locale
  
