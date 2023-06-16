@@ -47,16 +47,9 @@ sudo netplan apply
 - https://docs.docker.com/engine/install/linux-postinstall/
 
 
-## Install Docker-Compose
-```
-$ sudo apt install -y libffi-dev libssl-dev
-$ sudo apt install -y python3-dev
-$ sudo apt install -y python3 python3-pip
-$ sudo pip3 install docker-compose
-```
-
 ## Install Portainer
-See docs at https://documentation.portainer.io/v2.0/deploy/ceinstalldocker/
+
+- https://docs.portainer.io/start/install-ce/server/docker/linux
 
 ## Install Samba (optional)
 ```shell
