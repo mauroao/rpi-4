@@ -4,52 +4,66 @@
 </div>
 <br />
 
+## Table of contents
+
+- [Prepare ssd](#prepare-ssd)
+- [Connect via ssh](#connect-via-ssh)
+- [Update Ubuntu](#update-ubuntu)
+- [Configure static IP](#configure-static-ip)
+- [Install Docker](#install-docker)
+- [Install Portainer](#install-portainer)
+- [Install Samba](#install-samba)
+- [Install File Server](#install-file-server)
+- [Other](#other)
+
 ## Prepare ssd
 
 1. Open "Raspberry PI Imager" app;
-2. Choose Ubuntu Server;
+2. Choose Ubuntu Server LTS 64bits;
 3. Configure ssh;
 4. Configure hostname: rpi-4
 5. Configure user and pass: pi / pi
 6. Write image;
  
 ## Connect via ssh
-```Shell
-ssh pi@pi_ip_address
-password: pi
-```
+
+  ```Shell
+  ssh pi@pi_ip_address
+  password: pi
+  ```
 
 ## Update Ubuntu
-```
-sudo apt update
-sudo apt -y upgrade
-```
+
+  ```
+  sudo apt update
+  sudo apt -y upgrade
+  ```
 
 ## Configure static IP
-Edit `/etc/netplan/01-netcfg.yaml ` file:
-```yml
-network:
-  version: 2
-  ethernets:
-    eth0:
-      dhcp4: false
-      addresses: [192.168.0.25/24]
-      routes:
-        - to: default
-          via: 192.168.0.1
-      nameservers:
-        addresses: [8.8.8.8, 1.1.1.1]
-```
-Run command:
-```shell
-sudo netplan apply
-```
+
+- Edit `/etc/netplan/01-netcfg.yaml ` file:
+  ```yml
+  network:
+    version: 2
+    ethernets:
+      eth0:
+        dhcp4: false
+        addresses: [192.168.0.25/24]
+        routes:
+          - to: default
+            via: 192.168.0.1
+        nameservers:
+          addresses: [8.8.8.8, 1.1.1.1]
+  ```
+- Run command:
+  ```shell
+  sudo netplan apply
+  ```
 
 ## Install Docker
 
 - https://docs.docker.com/engine/install/ubuntu/
 - https://docs.docker.com/engine/install/linux-postinstall/
-
 
 ## Install Portainer
 
@@ -57,104 +71,95 @@ sudo netplan apply
 
 ## Install Samba
 
-Create folder
+- Create folder:
 
-```shell
-mkdir /home/pi/public
-sudo chmod -R 0777 /home/pi/public
-sudo chown -R nobody:nogroup /home/pi/public
-```
+  ```shell
+  mkdir -p /home/pi/public
+  sudo chmod -R 0777 /home/pi/public
+  sudo chown -R nobody:nogroup /home/pi/public
+  ```
 
-Install samba
+- Install samba service:
 
-```shell
-sudo apt update
-sudo apt install samba -y
-samba -V
-systemctl status smbd
-sudo smbpasswd -a pi
-```
+  ```shell
+  sudo apt update
+  sudo apt install samba -y
+  samba -V
+  systemctl status smbd
+  sudo smbpasswd -a pi
+  ```
 
-Edit `/etc/samba/smb.conf` file:
+- Edit `/etc/samba/smb.conf` file:
 
-```
-[global]
-workgroup = WORKGROUP
-server string = Samba Server %v
-security = user
-map to guest = Bad User
-dns proxy = no
+  ```
+  [global]
+  workgroup = WORKGROUP
+  server string = Samba Server %v
+  security = user
+  map to guest = Bad User
+  dns proxy = no
 
-[public]
-path = /home/pi/public
-valid users = pi
-read only = no
-create mode = 0777
-directory mode = 0777
-```
+  [public]
+  path = /home/pi/public
+  valid users = pi
+  read only = no
+  create mode = 0777
+  directory mode = 0777
+  ```
 
-Test samba configuration
+- Test samba configuration
 
-```shell
-testparm
-```
+  ```shell
+  testparm
+  ```
 
-Restart samba
+- Restart samba
 
-```shell
-sudo systemctl restart smbd.service
-```
+  ```shell
+  sudo systemctl restart smbd.service
+  ```
 ## Install File Server
 
-Create db and configuration files:
-```shell
-mkdir -p /home/pi/volumes/filebrowser/
-touch /home/pi/volumes/filebrowser/filebrowser.db
-touch /home/pi/volumes/filebrowser/settings.json
-```
+- Create db and configuration files:
+  ```shell
+  mkdir -p /home/pi/volumes/filebrowser/
+  touch /home/pi/volumes/filebrowser/filebrowser.db
+  touch /home/pi/volumes/filebrowser/settings.json
+  ```
 
-Fill settings.json file with bellow content:
-```yml
-{
-  "port": 80,
-  "baseURL": "",
-  "address": "",
-  "log": "stdout",
-  "database": "/database/filebrowser.db",
-  "root": "/srv"
-}
-```
+- Fill settings.json file with bellow content:
+  ```yml
+  {
+    "port": 80,
+    "baseURL": "",
+    "address": "",
+    "log": "stdout",
+    "database": "/database/filebrowser.db",
+    "root": "/srv"
+  }
+  ```
 
-Create stack on Portainer:
-```yml
-version: "2.1"
+- Create stack on Portainer:
+  ```yml
+  version: "2.1"
 
-services:
-  filebrowser:
-    image: filebrowser/filebrowser:s6
-    container_name: filebrowser 
-    restart: unless-stopped
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Sao_Paulo
-    volumes:
-      - /home/pi/public:/srv
-      - /home/pi/volumes/filebrowser/filebrowser.db:/database/filebrowser.db
-      - /home/pi/volumes/filebrowser/settings.json:/config/settings.json
-    ports:
-      - 7070:80
-```
-Start the stack.
-
-## Problem with locale
- 
-Sat Jul 28, 2012 7:57 pm <br>
-To fix this SSH problem, edit the file /etc/ssh/ssh_config on the SSH client (not the RPi) and remove the line:
-```
-SendEnv LANG LC_*
-```
-https://www.raspberrypi.org/forums/viewtopic.php?f=50&t=11870
+  services:
+    filebrowser:
+      image: filebrowser/filebrowser:s6
+      container_name: filebrowser 
+      restart: unless-stopped
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=America/Sao_Paulo
+      volumes:
+        - /home/pi/public:/srv
+        - /home/pi/volumes/filebrowser/filebrowser.db:/database/filebrowser.db
+        - /home/pi/volumes/filebrowser/settings.json:/config/settings.json
+      ports:
+        - 7070:80
+  ```
+- Start the stack.
 
 ## Other
 
