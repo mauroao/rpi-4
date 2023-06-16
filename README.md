@@ -14,6 +14,7 @@
 - [Install Portainer](#install-portainer)
 - [Install Samba](#install-samba)
 - [Install File Server](#install-file-server)
+- [Install MiniDLNA](#install-minidlna)
 - [Other](#other)
 
 ## Prepare ssd
@@ -71,7 +72,7 @@
 
 ## Install Samba
 
-- Create folder:
+- Create folders:
 
   ```shell
   mkdir -p /home/pi/public
@@ -158,6 +159,39 @@
         - /home/pi/volumes/filebrowser/settings.json:/config/settings.json
       ports:
         - 7070:80
+  ```
+- Start the stack.
+
+## Install MiniDLNA
+
+- Create folders:
+
+  ```shell
+  mkdir -p /home/pi/public/media/movies
+  mkdir -p /home/pi/public/media/tv
+  mkdir -p /home/pi/public/media/other
+  mkdir -p /home/pi/public/pics
+  ```
+
+- Create stack on Portainer:
+  ```yml
+  version: "2.1"
+  services:
+    minidlna:
+      image: vladgh/minidlna
+      container_name: minidlna
+      network_mode: "host"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=America/Sao_Paulo
+        - MINIDLNA_FRIENDLY_NAME=minidlna
+        - MINIDLNA_MEDIA_DIR_1=V,/media
+        - MINIDLNA_MEDIA_DIR_2=P,/pics
+      volumes:
+        - /home/pi/public/media:/media
+        - /home/pi/public/pics:/pics
+      restart: unless-stopped
   ```
 - Start the stack.
 
