@@ -12,7 +12,7 @@
 4. Configure hostname: rpi-4
 5. Configure user and pass: pi / pi
 6. Write image;
-
+ 
 ## Connect via ssh
 ```Shell
 ssh pi@pi_ip_address
@@ -61,7 +61,7 @@ Create folder
 
 ```shell
 mkdir /home/pi/public
-sudo chmod 0777 /home/pi/public
+sudo chmod -R 0777 /home/pi/public
 sudo chown -R nobody:nogroup /home/pi/public
 ```
 
@@ -104,9 +104,50 @@ Restart samba
 ```shell
 sudo systemctl restart smbd.service
 ```
+## Install File Server
 
- 
- ## Problem with locale
+Create db and configuration files:
+```shell
+mkdir -p /home/pi/volumes/filebrowser/
+touch /home/pi/volumes/filebrowser/filebrowser.db
+touch /home/pi/volumes/filebrowser/settings.json
+```
+
+Fill settings.json file with bellow content:
+```yml
+{
+  "port": 80,
+  "baseURL": "",
+  "address": "",
+  "log": "stdout",
+  "database": "/database/filebrowser.db",
+  "root": "/srv"
+}
+```
+
+Create stack on Portainer:
+```yml
+version: "2.1"
+
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:s6
+    container_name: filebrowser 
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /home/pi/public:/srv
+      - /home/pi/volumes/filebrowser/filebrowser.db:/database/filebrowser.db
+      - /home/pi/volumes/filebrowser/settings.json:/config/settings.json
+    ports:
+      - 7070:80
+```
+Start the stack.
+
+## Problem with locale
  
 Sat Jul 28, 2012 7:57 pm <br>
 To fix this SSH problem, edit the file /etc/ssh/ssh_config on the SSH client (not the RPi) and remove the line:
