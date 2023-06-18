@@ -6,8 +6,9 @@
 
 ## Table of contents
 
-- [Prepare ssd](#prepare-ssd)
-- [Connect via ssh](#connect-via-ssh)
+- [Prepare SSD](#prepare-ssd)
+- [Connect via SSH](#connect-via-ssh)
+- [Configure USB Sata Adapter](#configure-usb-sata-adapter)
 - [Update Ubuntu](#update-ubuntu)
 - [Configure static IP](#configure-static-ip)
 - [Install Docker](#install-docker)
@@ -17,7 +18,8 @@
 - [Install MiniDLNA](#install-minidlna)
 - [Other](#other)
 
-## Prepare ssd
+
+## Prepare SSD
 
 1. Open "Raspberry PI Imager" app;
 2. Choose Ubuntu Server LTS 64bits;
@@ -25,13 +27,34 @@
 4. Configure hostname: rpi-4
 5. Configure user and pass: pi / pi
 6. Write image;
+7. Connect disk to USB 2.0;
+
  
-## Connect via ssh
+## Connect via SSH
 
   ```Shell
   ssh pi@pi_ip_address
   password: pi
   ```
+
+## Configure USB Sata Adapter 
+
+1. Connect SSD via USB 2.0 port;
+2. Type below command:
+   ```shell
+   lsusb
+   ```
+3. Check the output:
+   ```
+   Bus 002 Device 002: ID 152d:0583 JMicron Technology Corp. / JMicron USA Technology Corp. JMS583Gen 2 to PCIe Gen3x2 Bridge
+   ```
+4. Copy the ID (eg: `152d:0583`);
+5. Run below command:
+   ```shell
+   sudo vim /boot/firmware/cmdline.txt
+   ```
+6. Save the file, shutdown, disconnect from USB 2.0, connect to USB 3.0;
+ 
 
 ## Update Ubuntu
 
