@@ -53,7 +53,14 @@
    ```shell
    sudo vim /boot/firmware/cmdline.txt
    ```
-6. Save the file, shutdown, disconnect from USB 2.0, connect to USB 3.0;
+6. Insert below snipet at the begining of line (use the ID):
+   ```
+   usb-storage.quirks=152d:0583:u
+   ``` 
+7. Save the file;
+8. Shutdonw Raspberry Pi; 
+9. Disconnect Sata Adapter from USB 2.0, connect it to USB 3.0;
+10. Turn it on;
  
 
 ## Update Ubuntu
