@@ -112,6 +112,7 @@
   mkdir -p /home/${USER}/public
   sudo chmod -R 0777 /home/${USER}/public
   sudo chown -R nobody:nogroup /home/${USER}/public
+  sudo chmod -R 777 /home/${USER}/public
   ```
 
 - Install samba service:
