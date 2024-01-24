@@ -153,7 +153,7 @@
   ```shell
   sudo systemctl restart smbd.service
   ```
-## Install File Server
+## Install File Browser
 
 - Create db and configuration files:
   ```shell
