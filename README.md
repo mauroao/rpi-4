@@ -195,7 +195,8 @@
       ports:
         - 7070:80
   ```
-- Start the stack.
+- Add USER environment variable;
+- Start the stack;
 
 ## Install MiniDLNA
 
