@@ -98,7 +98,7 @@
 
 ## Install Portainer
 
-  ```
+  ```shell
   mkdir -p /home/${USER}/docker/app_data/portainer
   docker run -d -p 8000:8000 -p 9000:9000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /home/${USER}/docker/app_data/portainer:/data portainer/portainer-ce:latest
   ```
@@ -112,7 +112,6 @@
   mkdir -p /home/${USER}/public
   sudo chmod -R 0777 /home/${USER}/public
   sudo chown -R nobody:nogroup /home/${USER}/public
-  sudo chmod -R 777 /home/${USER}/public
   ```
 
 - Install samba service:
@@ -196,7 +195,7 @@
       ports:
         - 7070:80
   ```
-- Add USER environment variable;
+- Add USER environment variables;
 - Start the stack;
 
 ## Install MiniDLNA
@@ -204,10 +203,10 @@
 - Create folders:
 
   ```shell
-  mkdir -p /home/pi/public/media/movies
-  mkdir -p /home/pi/public/media/tv
-  mkdir -p /home/pi/public/media/other
-  mkdir -p /home/pi/public/pics
+  mkdir -p /home/${USER}/public/media/movies
+  mkdir -p /home/${USER}/public/media/tv
+  mkdir -p /home/${USER}/public/media/other
+  mkdir -p /home/${USER}/public/pics
   ```
 
 - Create stack on Portainer:
