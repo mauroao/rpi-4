@@ -109,9 +109,9 @@
 - Create folders:
 
   ```shell
-  mkdir -p /home/pi/public
-  sudo chmod -R 0777 /home/pi/public
-  sudo chown -R nobody:nogroup /home/pi/public
+  mkdir -p /home/${USER}/public
+  sudo chmod -R 0777 /home/${USER}/public
+  sudo chown -R nobody:nogroup /home/${USER}/public
   ```
 
 - Install samba service:
@@ -121,7 +121,7 @@
   sudo apt install samba -y
   samba -V
   systemctl status smbd
-  sudo smbpasswd -a pi
+  sudo smbpasswd -a ${USER}
   ```
 
 - Edit `/etc/samba/smb.conf` file:
@@ -157,9 +157,10 @@
 
 - Create db and configuration files:
   ```shell
-  mkdir -p /home/pi/volumes/filebrowser/
-  touch /home/pi/volumes/filebrowser/filebrowser.db
-  touch /home/pi/volumes/filebrowser/settings.json
+  mkdir -p /home/${USER}/docker/app_data/filebrowser/
+  mkdir -p /home/${USER}/public/
+  touch /home/${USER}/docker/app_data/filebrowser/filebrowser.db
+  touch /home/${USER}/docker/app_data/filebrowser/settings.json
   ```
 
 - Fill settings.json file with bellow content:
@@ -188,9 +189,9 @@
         - PGID=1000
         - TZ=America/Sao_Paulo
       volumes:
-        - /home/pi/public:/srv
-        - /home/pi/volumes/filebrowser/filebrowser.db:/database/filebrowser.db
-        - /home/pi/volumes/filebrowser/settings.json:/config/settings.json
+        - /home/${USER}/public:/srv
+        - /home/${USER}/docker/app_data/filebrowser/filebrowser.db:/database/filebrowser.db
+        - /home/${USER}/docker/app_data/filebrowser/settings.json:/config/settings.json
       ports:
         - 7070:80
   ```
