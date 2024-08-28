@@ -242,24 +242,24 @@
 
 - Create stack on Portainer:
   ```yml
-version: "3"
+  version: "3"
 
-services:
-  pihole:
-    container_name: pihole
-    image: pihole/pihole:latest
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "80:80/tcp"
-    environment:
-      - TZ=America/Sao_Paulo
-      - WEBPASSWORD=admin
-    volumes:
-      - '/home/pi/volumes/etc-pihole:/etc/pihole'
-      - '/home/pi/volumes/etc-dnsmasq.d:/etc/dnsmasq.d'
-    restart: unless-stopped
-  ```
+  services:
+    pihole:
+      container_name: pihole
+      image: pihole/pihole:latest
+      ports:
+        - "53:53/tcp"
+        - "53:53/udp"
+        - "80:80/tcp"
+      environment:
+        - TZ=America/Sao_Paulo
+        - WEBPASSWORD=admin
+      volumes:
+        - '/home/pi/volumes/etc-pihole:/etc/pihole'
+        - '/home/pi/volumes/etc-dnsmasq.d:/etc/dnsmasq.d'
+      restart: unless-stopped
+    ```
 - Start the stack.
 - Go to http://rpi4-ip/admin
 
