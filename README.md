@@ -231,6 +231,40 @@
   ```
 - Start the stack.
 
+## Install pihole
+
+- Create folders:
+
+  ```shell
+  mkdir -p /home/pi/volumes/etc-dnsmasq.d
+  mkdir -p /home/pi/volumes/etc-pihole
+  ```
+
+- Create stack on Portainer:
+  ```yml
+version: "3"
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+    environment:
+      - TZ=America/Sao_Paulo
+      - WEBPASSWORD=admin
+    volumes:
+      - '/home/pi/volumes/etc-pihole:/etc/pihole'
+      - '/home/pi/volumes/etc-dnsmasq.d:/etc/dnsmasq.d'
+    restart: unless-stopped
+  ```
+- Start the stack.
+- Go to http://rpi4-ip/admin
+
+Throubleshooting: IF port 53 already in use, disable systemd-resolved service and change /etc/resolv.conf. (from https://discourse.pi-hole.net/t/docker-unable-to-bind-to-port-53/45082/7 )
+
 ## Other
 
 - https://askubuntu.com/questions/1263284/apt-update-throws-signature-error-in-ubuntu-20-04-container-on-arm 
