@@ -14,10 +14,12 @@
 - [Install Docker](#install-docker)
 - [Install Portainer](#install-portainer)
 - [Install Samba](#install-samba)
-- [Install File Server](#install-file-server)
+- [Install File Browser](#install-file-browser)
 - [Install MiniDLNA](#install-minidlna)
+- [Install PiHole](#install-pihole)
+- [Install Transmission](#install-transmission)
+- [Install JDownloader2](#install-jdownloader2)
 - [Other](#other)
-
 
 ## Prepare SSD
 
@@ -65,7 +67,7 @@
 
 ## Update Ubuntu
 
-  ```
+  ```shell
   sudo apt update
   sudo apt -y upgrade
   ```
@@ -90,6 +92,10 @@
   ```shell
   sudo netplan apply
   ```
+- Check if adapter accepted configuration:
+  ```
+  ip addr show eth0
+  ```
 
 ## Install Docker
 
@@ -99,8 +105,8 @@
 ## Install Portainer
 
   ```shell
-  mkdir -p /home/${USER}/docker/app_data/portainer
-  docker run -d -p 8000:8000 -p 9000:9000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /home/${USER}/docker/app_data/portainer:/data portainer/portainer-ce:latest
+  mkdir -p /home/pi/docker/app_data/portainer
+  docker run -d -p 8000:8000 -p 9000:9000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /home/pi/docker/app_data/portainer:/data portainer/portainer-ce:latest
   ```
 > https://docs.portainer.io/start/install-ce/server/docker/linux
 
@@ -109,9 +115,9 @@
 - Create folders:
 
   ```shell
-  mkdir -p /home/${USER}/public
-  sudo chmod -R 0777 /home/${USER}/public
-  sudo chown -R nobody:nogroup /home/${USER}/public
+  mkdir -p /home/pi/public
+  sudo chmod -R 0777 /home/pi/public
+  sudo chown -R nobody:nogroup /home/pi/public
   ```
 
 - Install samba service:
@@ -121,7 +127,7 @@
   sudo apt install samba -y
   samba -V
   systemctl status smbd
-  sudo smbpasswd -a ${USER}
+  sudo smbpasswd -a pi
   ```
 
 - Edit `/etc/samba/smb.conf` file:
@@ -153,14 +159,15 @@
   ```shell
   sudo systemctl restart smbd.service
   ```
+
 ## Install File Browser
 
 - Create db and configuration files:
   ```shell
-  mkdir -p /home/${USER}/docker/app_data/filebrowser/
-  mkdir -p /home/${USER}/public/
-  touch /home/${USER}/docker/app_data/filebrowser/filebrowser.db
-  touch /home/${USER}/docker/app_data/filebrowser/settings.json
+  mkdir -p /home/pi/docker/app_data/filebrowser/
+  mkdir -p /home/pi/public/
+  touch /home/pi/docker/app_data/filebrowser/filebrowser.db
+  touch /home/pi/docker/app_data/filebrowser/settings.json
   ```
 
 - Fill settings.json file with bellow content:
@@ -189,9 +196,9 @@
         - PGID=1000
         - TZ=America/Sao_Paulo
       volumes:
-        - /home/${USER}/public:/srv
-        - /home/${USER}/docker/app_data/filebrowser/filebrowser.db:/database/filebrowser.db
-        - /home/${USER}/docker/app_data/filebrowser/settings.json:/config/settings.json
+        - /home/pi/public:/srv
+        - /home/pi/docker/app_data/filebrowser/filebrowser.db:/database/filebrowser.db
+        - /home/pi/docker/app_data/filebrowser/settings.json:/config/settings.json
       ports:
         - 7070:80
   ```
@@ -203,10 +210,10 @@
 - Create folders:
 
   ```shell
-  mkdir -p /home/${USER}/public/media/movies
-  mkdir -p /home/${USER}/public/media/tv
-  mkdir -p /home/${USER}/public/media/other
-  mkdir -p /home/${USER}/public/pics
+  mkdir -p /home/pi/public/media/movies
+  mkdir -p /home/pi/public/media/tv
+  mkdir -p /home/pi/public/media/other
+  mkdir -p /home/pi/public/pics
   ```
 
 - Create stack on Portainer:
@@ -231,13 +238,13 @@
   ```
 - Start the stack.
 
-## Install pihole
+## Install PiHole
 
 - Create folders:
 
   ```shell
-  mkdir -p /home/pi/volumes/etc-dnsmasq.d
-  mkdir -p /home/pi/volumes/etc-pihole
+  mkdir -p /home/pi/docker/app-data/etc-dnsmasq.d
+  mkdir -p /home/pi/docker/app-data/etc-pihole
   ```
 
 - Create stack on Portainer:
@@ -256,14 +263,75 @@
         - TZ=America/Sao_Paulo
         - WEBPASSWORD=admin
       volumes:
-        - '/home/pi/volumes/etc-pihole:/etc/pihole'
-        - '/home/pi/volumes/etc-dnsmasq.d:/etc/dnsmasq.d'
+        - '/home/pi/docker/app-data/etc-pihole:/etc/pihole'
+        - '/home/pi/docker/app-data/etc-dnsmasq.d:/etc/dnsmasq.d'
       restart: unless-stopped
     ```
 - Start the stack.
 - Go to http://rpi4-ip/admin
 
-Throubleshooting: IF port 53 already in use, disable systemd-resolved service and change /etc/resolv.conf. (from https://discourse.pi-hole.net/t/docker-unable-to-bind-to-port-53/45082/7 )
+Throubleshooting:   
+IF port 53 already in use, disable systemd-resolved service and change /etc/resolv.conf. 
+> From: https://discourse.pi-hole.net/t/docker-unable-to-bind-to-port-53/45082/7 
+
+## Install Transmission
+
+- Create folders:
+
+  ```shell
+  mkdir -p /home/pi/public/torrents/watch
+  ```
+
+- Create stack on Portainer:
+  ```yml
+  version: "2.1"
+
+  volumes:
+    transmission-data: {}
+
+  services:
+    transmission:
+      image: lscr.io/linuxserver/transmission:latest
+      container_name: transmission
+      restart: unless-stopped
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=America/Sao_Paulo
+      volumes:
+        - /home/pi/public/torrents:/downloads
+        - /home/pi/public/torrents/watch:/watch
+        - transmission-data:/config
+      ports:
+        - 9595:9091
+        - 51413:51413
+        - 51413:51413/udp
+  ```
+
+## Install JDownloader2
+
+- Create folders:
+
+  ```shell
+  mkdir -p    - /home/pi/public/downloads
+  mkdir -p    - /home/pi/docker/app-data/jdownloader
+  ```
+
+- Create stack on Portainer:
+  ```yml
+  version: "2.1"
+
+  services:
+    jdownloader2:
+      image: jlesage/jdownloader-2
+      container_name: jdownloader-2
+      restart: unless-stopped
+      volumes:
+        - /home/pi/public/downloads:/output:rw
+        - /home/pi/docker/app-data/jdownloader:/config:rw
+      ports:
+        - 5800:5800
+  ```
 
 ## Other
 
