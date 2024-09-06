@@ -332,6 +332,25 @@ IF port 53 already in use, disable systemd-resolved service and change /etc/reso
       ports:
         - 5800:5800
   ```
+  
+## Install Glances
+
+- Create stack on Portainer:
+  ```yml
+  services:
+    monitoring:
+      image: nicolargo/glances:latest
+      container_name: glances
+      restart: always
+      pid: host
+      ports:
+        - 61208-61209:61208-61209
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /etc/os-release:/etc/os-release:ro
+      environment:
+        - "GLANCES_OPT=-w"
+  ```
 
 ## Other
 
