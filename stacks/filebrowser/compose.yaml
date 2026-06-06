@@ -1,0 +1,16 @@
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:v2-s6
+    container_name: filebrowser
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /home/pi/public:/srv
+      - /home/pi/volumes/filebrowser/filebrowser.db:/database/filebrowser.db
+      - /home/pi/volumes/filebrowser/settings.json:/config/settings.json
+    ports:
+      - 7070:80
+networks: {}

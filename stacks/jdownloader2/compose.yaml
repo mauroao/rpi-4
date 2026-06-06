@@ -1,0 +1,10 @@
+services:
+  jdownloader2:
+    image: jlesage/jdownloader-2
+    container_name: jdownloader-2
+    restart: unless-stopped
+    volumes:
+      - /home/pi/public/downloads:/output:rw
+      - /home/pi/volumes/jdownloader:/config:rw
+    ports:
+      - 5800:5800

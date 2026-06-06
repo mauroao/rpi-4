@@ -1,0 +1,20 @@
+volumes:
+  transmission-data: {}
+
+services:
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /home/pi/public/torrents:/downloads
+      - /home/pi/public/torrents/watch:/watch
+      - transmission-data:/config
+    ports:
+      - 9595:9091
+      - 51413:51413
+      - 51413:51413/udp
