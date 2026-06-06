@@ -12,7 +12,7 @@
 - [Update Ubuntu](#update-ubuntu)
 - [Configure static IP](#configure-static-ip)
 - [Install Docker](#install-docker)
-- [Install Portainer](#install-portainer)
+- [Link Dockge Stacks](#link-dockge-stacks)
 - [Install Samba](#install-samba)
 - [Install File Browser](#install-file-browser)
 - [Install MiniDLNA](#install-minidlna)
@@ -102,13 +102,16 @@
 - https://docs.docker.com/engine/install/ubuntu/
 - https://docs.docker.com/engine/install/linux-postinstall/
 
-## Install Portainer
+## Link Dockge Stacks
+
+Clone this repository on the `rpi-4` host and create a symbolic link so Dockge reads the stack files from `/opt/stacks`.
 
   ```shell
-  mkdir -p /home/pi/docker/app_data/portainer
-  docker run -d -p 8000:8000 -p 9000:9000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v /home/pi/docker/app_data/portainer:/data portainer/portainer-ce:latest
+  git clone <repo-url> /home/pi/rpi-4
+  ln -s /home/pi/rpi-4/stacks /opt/stacks
   ```
-> https://docs.portainer.io/start/install-ce/server/docker/linux
+
+Dockge will use the compose files from `/opt/stacks`.
 
 ## Install Samba
 
@@ -182,26 +185,7 @@
   }
   ```
 
-- Create stack on Portainer:
-  ```yml
-  version: "2.1"
-
-  services:
-    filebrowser:
-      image: filebrowser/filebrowser:s6
-      container_name: filebrowser 
-      restart: unless-stopped
-      environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=America/Sao_Paulo
-      volumes:
-        - /home/pi/public:/srv
-        - /home/pi/docker/app_data/filebrowser/filebrowser.db:/database/filebrowser.db
-        - /home/pi/docker/app_data/filebrowser/settings.json:/config/settings.json
-      ports:
-        - 7070:80
-  ```
+- The compose file for this service is managed in `./stacks/filebrowser/compose.yaml` and Dockge reads it from `/opt/stacks`.
 - Add USER environment variables;
 - Start the stack;
 
@@ -216,26 +200,7 @@
   mkdir -p /home/pi/public/pics
   ```
 
-- Create stack on Portainer:
-  ```yml
-  version: "2.1"
-  services:
-    minidlna:
-      image: vladgh/minidlna
-      container_name: minidlna
-      network_mode: "host"
-      environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=America/Sao_Paulo
-        - MINIDLNA_FRIENDLY_NAME=minidlna
-        - MINIDLNA_MEDIA_DIR_1=V,/media
-        - MINIDLNA_MEDIA_DIR_2=P,/pics
-      volumes:
-        - /home/pi/public/media:/media
-        - /home/pi/public/pics:/pics
-      restart: unless-stopped
-  ```
+- The compose file for this service is managed in `./stacks/minidlna/compose.yaml` and Dockge reads it from `/opt/stacks`.
 - Start the stack.
 
 ## Install PiHole
@@ -247,26 +212,7 @@
   mkdir -p /home/pi/docker/app-data/etc-pihole
   ```
 
-- Create stack on Portainer:
-  ```yml
-  version: "3"
-
-  services:
-    pihole:
-      container_name: pihole
-      image: pihole/pihole:latest
-      ports:
-        - "53:53/tcp"
-        - "53:53/udp"
-        - "80:80/tcp"
-      environment:
-        - TZ=America/Sao_Paulo
-        - WEBPASSWORD=admin
-      volumes:
-        - '/home/pi/docker/app-data/etc-pihole:/etc/pihole'
-        - '/home/pi/docker/app-data/etc-dnsmasq.d:/etc/dnsmasq.d'
-      restart: unless-stopped
-    ```
+- The compose file for this service is managed in `./stacks/pihole/compose.yaml` and Dockge reads it from `/opt/stacks`.
 - Start the stack.
 - Go to http://rpi4-ip/admin
 
@@ -282,31 +228,7 @@ IF port 53 already in use, disable systemd-resolved service and change /etc/reso
   mkdir -p /home/pi/public/torrents/watch
   ```
 
-- Create stack on Portainer:
-  ```yml
-  version: "2.1"
-
-  volumes:
-    transmission-data: {}
-
-  services:
-    transmission:
-      image: lscr.io/linuxserver/transmission:latest
-      container_name: transmission
-      restart: unless-stopped
-      environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=America/Sao_Paulo
-      volumes:
-        - /home/pi/public/torrents:/downloads
-        - /home/pi/public/torrents/watch:/watch
-        - transmission-data:/config
-      ports:
-        - 9595:9091
-        - 51413:51413
-        - 51413:51413/udp
-  ```
+- The compose file for this service is managed in `./stacks/transmission/compose.yaml` and Dockge reads it from `/opt/stacks`.
 
 ## Install JDownloader2
 
@@ -317,40 +239,11 @@ IF port 53 already in use, disable systemd-resolved service and change /etc/reso
   mkdir -p    - /home/pi/docker/app-data/jdownloader
   ```
 
-- Create stack on Portainer:
-  ```yml
-  version: "2.1"
-
-  services:
-    jdownloader2:
-      image: jlesage/jdownloader-2
-      container_name: jdownloader-2
-      restart: unless-stopped
-      volumes:
-        - /home/pi/public/downloads:/output:rw
-        - /home/pi/docker/app-data/jdownloader:/config:rw
-      ports:
-        - 5800:5800
-  ```
+- The compose file for this service is managed in `./stacks/jdownloader2/compose.yaml` and Dockge reads it from `/opt/stacks`.
   
 ## Install Glances
 
-- Create stack on Portainer:
-  ```yml
-  services:
-    monitoring:
-      image: nicolargo/glances:latest
-      container_name: glances
-      restart: always
-      pid: host
-      ports:
-        - 61208-61209:61208-61209
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-        - /etc/os-release:/etc/os-release:ro
-      environment:
-        - "GLANCES_OPT=-w"
-  ```
+- The compose file for this service is managed in `./stacks/glances/compose.yaml` and Dockge reads it from `/opt/stacks`.
 
 ## Other
 
@@ -359,4 +252,3 @@ IF port 53 already in use, disable systemd-resolved service and change /etc/reso
 - https://www.raspberrypi.org/documentation/hardware/raspberrypi/bootmodes/msd.md
 - Measure temp: `vcgencmd measure_temp`
 - https://xavierberger.github.io/RPi-Monitor-docs/index.html
-
